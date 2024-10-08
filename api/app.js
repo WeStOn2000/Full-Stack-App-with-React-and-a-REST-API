@@ -8,6 +8,7 @@ const users = require('./seed/data.json')
 const { sequelize, User , Course } = require('./models');
 const fs = require('fs');
 const path = require('path');
+const cors = require('cors')
 
 
 // the Express app
@@ -24,6 +25,7 @@ app.use(express.json());
 
 //  API routes
 app.use('/api',routes);
+app.use(cors())
 
 // friendly greeting for the root route
 app.get('/', (req, res) => {
