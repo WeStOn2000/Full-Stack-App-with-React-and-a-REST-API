@@ -64,18 +64,37 @@ app.use((err, req, res, next) => {
 const seedData = async () => {
   try {
     const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'seed', 'data.json'), 'utf8'));
-    
-    // Seed Users
-    await User.bulkCreate(data.users);
-    console.log('Users seeded successfully');
 
-    // Seed Courses
-    await Course.bulkCreate(data.courses);
-    console.log('Courses seeded successfully');
+    // Check and seed Users
+    for (const user of data.users) {
+      const [foundUser, created] = await User.findOrCreate({
+        where: { emailAddress: user.emailAddress },
+        defaults: user,
+      });
+      if (created) {
+        console.log(`User ${user.firstName} ${user.lastName} added successfully`);
+      } else {
+        console.log(`User ${user.firstName} ${user.lastName} already exists`);
+      }
+    }
+
+    // Check and seed Courses
+    for (const course of data.courses) {
+      const [foundCourse, created] = await Course.findOrCreate({
+        where: { title: course.title },
+        defaults: course,
+      });
+      if (created) {
+        console.log(`Course ${course.title} added successfully`);
+      } else {
+        console.log(`Course ${course.title} already exists`);
+      }
+    }
   } catch (error) {
     console.error('Error seeding data:', error);
   }
 };
+
 
 sequelize
   .authenticate()
