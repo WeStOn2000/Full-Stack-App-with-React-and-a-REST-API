@@ -1,7 +1,7 @@
-import  { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from 'axios';
-import { Link, useNavigate , useParams } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { UserContext } from "../context/UserContext";
 import ReactMarkdown from 'react-markdown';
@@ -88,7 +88,7 @@ const CourseDetail = () => {
               <h3 className="course--detail--title">Course</h3>
               <h4 className="course--name">{course.title}</h4>
               {/* <p>By {course.userId}</p> */}
-              <p>By {course.User ? `${course.user.firstName} ${course.user.lastName}` : 'Unknown'}</p>
+              <p>By {course.User ? `${course.User.firstName} ${course.User.lastName}` : 'Unknown'}</p>
 
               <ReactMarkdown>{course.description}</ReactMarkdown>
             </div>

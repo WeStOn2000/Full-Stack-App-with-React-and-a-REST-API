@@ -1,7 +1,8 @@
-
+//styles
 import "../styles/global.css";
-import { Link } from "react-router-dom";
+
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
 const Header = () => {
@@ -10,7 +11,7 @@ const Header = () => {
     <header>
       <div className="wrap header--flex">
         <h1 className="header--logo">
-          <Link to="/">Courses</Link>
+        <Link to="/">Courses</Link>
         </h1>
         <nav>
           <ul className="header--signedout">

@@ -8,11 +8,15 @@ html {
 body {
     font-family: 'Work Sans', sans-serif;
 }
+
 h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-}
+    font-size: 2.5rem;       /* Increase font size for better readability */
+    font-weight: 900;         /* Make it more bold */
+    margin-bottom: 2.5rem;    /* Add more space below */
+    margin-top: 1.5rem;       /* Add space above */
+    letter-spacing: 0.5px;    /* Slight letter spacing for better readability */
+    line-height: 1.4;         /* Adjust line height for better spacing */
+  }
 p {
     font-weight: 300;
     margin-bottom: 1.5rem;
@@ -26,7 +30,7 @@ a {
 .wrap {
     max-width: 1250px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 25px 2rem;
 }
 header {
     background: #57496e;
@@ -35,6 +39,7 @@ header {
     margin-bottom: 2rem;
 }
 .header--flex {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -173,7 +178,7 @@ textarea {
     padding: .75rem 1.5rem;
     border: 0;
     margin: 0 0 .5rem 0;
-    display: block;
+    display: block ;
     width: 210px;
     text-align: center;
     border-radius: .5rem;
@@ -185,7 +190,7 @@ textarea {
 }
 .button:not(.button-secondary):hover {
     background: #63537d;
-    cursor: pointer;
+    cursor:pointer;
 }
 .button-secondary {
     color: #7c689b;
