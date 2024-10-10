@@ -1,17 +1,18 @@
-import { Routes, Route } from "react-router-dom";
-import "./global.css";
-import Header from "./components/header";
-import Courses from "./components/courses";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Header from './components/header';
+import Courses from './components/courses';
+import CourseDetail from './components/courseDetail';
 
-function App() {
+export function App() {
   return (
-    <div>
+    <Router>
+      <div>
         <Header />
-      <Routes>
-        <Route path='/' element={<Courses />}/>
-      </Routes>
-    </div>
+        <Switch>
+          <Route exact path="/" component={Courses} />
+          <Route path="/courses/:id" component={CourseDetail} />
+        </Switch>
+      </div>
+    </Router>
   );
 }
-
-export default App;
