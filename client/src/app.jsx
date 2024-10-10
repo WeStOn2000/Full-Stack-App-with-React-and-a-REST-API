@@ -1,11 +1,17 @@
-import './global.css'
-import Header from './components/header'
-import { Courses } from './components/courses'
+import { Routes, Route } from "react-router-dom";
+import "./global.css";
+import Header from "./components/header";
+import Courses from "./components/courses";
 
 function App() {
   return (
-   <Header />
-   <Courses />
-  )
+    <div>
+        <Header />
+      <Routes>
+        <Route path='/' element={<Courses />}/>
+      </Routes>
+    </div>
+  );
 }
-export default App
+
+export default App;
