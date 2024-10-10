@@ -1,11 +1,11 @@
-import  { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { UserContext } from '../context/UserContext';
+
+import "../styles/global.css";
+import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 const Header = () => {
-  
-  const { authUser, signOut } = useContext(UserContext);
-
+  const { user } = useContext(UserContext);
   return (
     <header>
       <div className="wrap header--flex">
@@ -13,23 +13,22 @@ const Header = () => {
           <Link to="/">Courses</Link>
         </h1>
         <nav>
-          <ul className="header--signedin">
-            {authUser ? (
-              // Render user's name and Sign Out button if authenticated
+          <ul className="header--signedout">
+            {/* {console.log("Auth User: ", user)} */}
+            {user ? (
               <>
-                <li>Welcome, {authUser.name}!</li>
+                <li>Welcome, {user.firstName}</li>
                 <li>
-                  <button onClick={signOut}>Sign Out</button>
+                  <Link to="/signout">Sign Out</Link>
                 </li>
               </>
             ) : (
-              // Render Sign In and Sign Up links if not authenticated
               <>
                 <li>
-                  <Link to="/signin">Sign In</Link>
+                  <Link to="/signup">Sign Up</Link>
                 </li>
                 <li>
-                  <Link to="/signup">Sign Up</Link>
+                  <Link to="/signin">Sign In</Link>
                 </li>
               </>
             )}

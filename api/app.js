@@ -24,8 +24,9 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 //  API routes
-app.use('/api',routes);
 app.use(cors())
+app.use('/api',routes);
+
 
 // friendly greeting for the root route
 app.get('/', (req, res) => {

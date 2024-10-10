@@ -1,5 +1,5 @@
 // ValidationErrors.jsx
-import PropTypes from 'prop-types'; // Import PropTypes
+import PropTypes from 'prop-types'; 
 
 const ValidationErrors = ({ errors }) => {
   return (

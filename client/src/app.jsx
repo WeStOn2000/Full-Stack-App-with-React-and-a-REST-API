@@ -1,36 +1,47 @@
-// App.js
-import { BrowserRouter as Router, Route, Routes,} from 'react-router-dom';
-import {  UserProvider } from './context/UserContext';
-//Import components
-import UserSignIn from './components/UserSignIn';
-import UserSignUp from './components/UserSignUp';
-import Header from './components/header';
-import CourseDetail from './components/courseDetail';
-import Courses from './components/courses';
-import CreateCourse from './components/CreateCourse';
-import UpdateCourse from './components/UpdateCourse';
+import { Route, Routes } from 'react-router-dom';
+
+import {UserContext} from './context/UserContext';
 import PrivateRoute from './components/PrivateRoute';
 
+import Courses from './components/courses';
+import Header from './components/header';
+import CourseDetail from './components/courseDetail';
+import CreateCourse from './components/CreateCourse';
+import Error from './components/Error';
+import Forbidden from './components/Forbidden';
+import NotFound from './components/NotFound';
+import UserSignIn from './components/UserSignIn';
+import UserSignOut from './components/UserSignOut';
+import UserSignUp from './components/UserSignUp';
+import UpdateCourse from './components/UpdateCourse';
 
 function App() {
+
   return (
-    <UserProvider>
-     <Router>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Courses />} />
-          <Route path="/courses/:id" element={<CourseDetail />} />
-          <Route path="/signin" element={<UserSignIn />} />
-          <Route path="/signup" element={<UserSignUp />} />
-          <Route path="/courses/create" element={<PrivateRoute />}>
-            <Route path="" element={<CreateCourse />} />
-          </Route>
-          <Route path="/courses/:id/update" element={<PrivateRoute />}>
-            <Route path="" element={<UpdateCourse />} />
-          </Route>
-        </Routes>
-      </Router>
-    </UserProvider>
+    <div>
+      {console.log(UserContext)}
+      <Header/>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Courses/>} />
+        <Route path="/courses/:id" element={<CourseDetail/>} />
+        <Route path='/error' element={<Error/>} />
+        <Route path='/forbidden' element={<Forbidden />} />
+        <Route path='/not-found' element={<NotFound />} />
+        <Route path='/signin' element={<UserSignIn />} />
+        <Route path='/signout' element={<UserSignOut />} />
+        <Route path='/signup' element={<UserSignUp />} />
+
+        {/* Protected Routes */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/courses/create" element={<CreateCourse/>} />
+          <Route path="/courses/:id/update" element={<UpdateCourse />} />
+        </Route>
+        {/* Anything Else*/}
+        <Route path='*' element={<NotFound/>} />
+      </Routes>
+  
+    </div>
   );
 }
 

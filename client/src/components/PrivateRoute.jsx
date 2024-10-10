@@ -1,11 +1,12 @@
 // PrivateRoute.jsx
 import { useContext } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { UserContext } from '../context/UserContext';
 
 const PrivateRoute = () => {
-  const { authUser } = useContext(UserContext);
-  return authUser ? <Outlet /> : <Navigate to="/signin" />;
+  const { user } = useContext(UserContext);
+  return user ? <Outlet /> : <Navigate to="/signin" replace />
+    
 };
 
 export default PrivateRoute;

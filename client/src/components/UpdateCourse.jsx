@@ -18,7 +18,6 @@ const UpdateCourse = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch course details when component mounts
     const fetchCourse = async () => {
       try {
         const response = await axios.get(`/api/courses/${id}`);
@@ -37,15 +36,13 @@ const UpdateCourse = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Send PUT request to update the course
       await axios.put(`/api/courses/${id}`, {
-        userId: authUser.id,  // Assuming you're passing the logged-in user's id
+        userId: authUser.id,
         title: course.title,
         description: course.description,
         estimatedTime: course.estimatedTime,
         materialsNeeded: course.materialsNeeded
       });
-      // Redirect to the course detail page after successful update
       navigate(`/courses/${id}`);
     } catch (error) {
         if (error.response.status === 400) {
@@ -62,6 +59,7 @@ const UpdateCourse = () => {
       <form onSubmit={handleSubmit}>
         <div className="main--flex">
           <div>
+            {/* Aligned with form input and textarea styling */}
             <label>Course Title</label>
             <input 
               type="text" 

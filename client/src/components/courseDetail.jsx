@@ -1,58 +1,82 @@
-import { useState, useEffect, useContext } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
-import { UserContext } from '../context/UserContext'; 
+import  { useState, useEffect, useContext } from "react";
+import axios from 'axios';
+import { Link, useNavigate , useParams } from "react-router-dom";
 
-function CourseDetail() {
+
+import { UserContext } from "../context/UserContext";
+import ReactMarkdown from 'react-markdown';
+
+const CourseDetail = () => {
+  const { id } = useParams(); // Retrieve the course ID from the URL
+  const { user } = useContext(UserContext); // Access the Authenticated User
+  const navigate = useNavigate();
+
+  // console.log("Course ID from URL: ", id);
   const [course, setCourse] = useState(null);
-  const { id } = useParams();
-  const navigate = useNavigate(); 
-  const { authUser } = useContext(UserContext); 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/courses/${id}`)
-      .then(response => response.json())
-      .then(data => setCourse(data))
-      .catch(error => console.error('Error fetching course details:', error));
-  }, [id]);
-
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
-      fetch(`http://localhost:5000/api/courses/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authUser.token}`, 
-        },
-      })
-        .then((response) => {
-          if (response.ok) {
-            alert('Course deleted successfully');
-            navigate('/'); 
-          } else {
-            throw new Error('Failed to delete the course');
-          }
+    // Fetch course details only if the ID is valid
+    if (id) {
+      //console.log('Id Param from URL: ', id);
+      axios.get(`http://localhost:5000/api/courses/${id}`)
+        .then(response => {
+          const courseData = response.data;
+          setCourse(courseData);
+          //console.log(response.data);
+          setLoading(false); // Stop loading once data is fetched
+          // return axios.get(`http://localhost:5000/api/user`)
         })
-        .catch((error) => {
-          console.error('Error deleting course:', error);
-          alert('Failed to delete the course');
+        .catch(error => {
+          setError('Course not found',error);
+          setLoading(false); // Stop loading if there's an error
         });
+    } else {
+      setLoading(false); // Stop loading if ID is invalid
+      setError('Invalid course ID');
     }
-  };
+  }, [id]); // The dependency array should only include `id`
 
-  if (!course) return <div>Loading...</div>;
+  const handleDeleteCourse = async () => {
+    if (window.confirm("Delete this course? (Action cannot be undone)")) {
+      try {
+        const options = {
+          method: "DELETE",
+          url: `http://localhost:5000/api/courses/${id}`,
+          headers: {
+            'Authorization' : `Basic ${user.authToken}`
+          }
+        };
+        await axios(options);
+        navigate("/");
+      } catch (error) {
+        //console.error("Error deleting course:", error);
+        setError("Failed to delete course",error);
+      }
+    }
+  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
     <main>
       <div className="actions--bar">
         <div className="wrap">
-          {authUser && authUser.id === course.user.id && (
+          {/* Conditionally render Update and Delete buttons */}
+          {user && user.id === course.userId && (
             <>
-              <Link className="button" to={`/courses/${id}/update`}>Update Course</Link>
-              <button className="button" onClick={handleDelete}>Delete Course</button>
+              <Link className="button" to={`/courses/${id}/update`}>
+                Update Course
+              </Link>
+              <button className="button" onClick={handleDeleteCourse}>
+                Delete Course
+              </button>
             </>
           )}
-          <Link className="button button-secondary" to="/">Return to List</Link>
+          <Link className="button button-secondary" to="/">
+            Return to List
+          </Link>
         </div>
       </div>
 
@@ -63,7 +87,9 @@ function CourseDetail() {
             <div>
               <h3 className="course--detail--title">Course</h3>
               <h4 className="course--name">{course.title}</h4>
-              <p>By {course.user.firstName} {course.user.lastName}</p>
+              {/* <p>By {course.userId}</p> */}
+              <p>By {course.User ? `${course.user.firstName} ${course.user.lastName}` : 'Unknown'}</p>
+
               <ReactMarkdown>{course.description}</ReactMarkdown>
             </div>
             <div>
@@ -71,15 +97,15 @@ function CourseDetail() {
               <p>{course.estimatedTime}</p>
 
               <h3 className="course--detail--title">Materials Needed</h3>
-              <ReactMarkdown className="course--detail--list">
-                {course.materialsNeeded}
-              </ReactMarkdown>
+              <ul className="course--detail--list">
+              <ReactMarkdown>{course.materialsNeeded}</ReactMarkdown>
+              </ul>
             </div>
           </div>
         </form>
       </div>
     </main>
   );
-}
+};
 
 export default CourseDetail;
