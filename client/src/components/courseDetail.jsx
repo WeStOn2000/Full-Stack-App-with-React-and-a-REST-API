@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import { UserContext } from '../context/UserContext'; 
 
 function CourseDetail() {
   const [course, setCourse] = useState(null);
   const { id } = useParams();
+  const navigate = useNavigate(); 
+  const { authUser } = useContext(UserContext); 
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/courses/${id}`)
@@ -13,18 +16,46 @@ function CourseDetail() {
       .catch(error => console.error('Error fetching course details:', error));
   }, [id]);
 
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to delete this course?')) {
+      fetch(`http://localhost:5000/api/courses/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authUser.token}`, 
+        },
+      })
+        .then((response) => {
+          if (response.ok) {
+            alert('Course deleted successfully');
+            navigate('/'); 
+          } else {
+            throw new Error('Failed to delete the course');
+          }
+        })
+        .catch((error) => {
+          console.error('Error deleting course:', error);
+          alert('Failed to delete the course');
+        });
+    }
+  };
+
   if (!course) return <div>Loading...</div>;
 
   return (
     <main>
       <div className="actions--bar">
         <div className="wrap">
-          <Link className="button" to={`/courses/${id}/update`}>Update Course</Link>
-          <Link className="button" to="#">Delete Course</Link>
+          {authUser && authUser.id === course.user.id && (
+            <>
+              <Link className="button" to={`/courses/${id}/update`}>Update Course</Link>
+              <button className="button" onClick={handleDelete}>Delete Course</button>
+            </>
+          )}
           <Link className="button button-secondary" to="/">Return to List</Link>
         </div>
       </div>
-      
+
       <div className="wrap">
         <h2>Course Detail</h2>
         <form>
