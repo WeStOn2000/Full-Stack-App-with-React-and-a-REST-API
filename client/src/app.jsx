@@ -1,5 +1,8 @@
+/**
+ * App file that acquires components and sets the routes that are needed for the react web application
+ */
+
 import { Route, Routes } from "react-router-dom";
-import PrivateRoute from "./components/PrivateRoute";
 //importing components
 import Courses from "./components/courses";
 import Header from "./components/header";
@@ -12,6 +15,7 @@ import UserSignIn from "./components/UserSignIn";
 import UserSignOut from "./components/UserSignOut";
 import UserSignUp from "./components/UserSignUp";
 import UpdateCourse from "./components/UpdateCourse";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   return (
@@ -41,5 +45,5 @@ function App() {
     </div>
   );
 }
-
+//Exports the app component to the main.jsx to be rendered to the DOM
 export default App;

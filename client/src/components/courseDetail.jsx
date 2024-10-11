@@ -1,3 +1,7 @@
+ /**
+   *Course detail component that contains the detail , deletes and updates courses 
+   */
+//importing hooks 
 import { useState, useEffect, useContext } from "react";
 import axios from 'axios';
 import { Link, useNavigate } from "react-router-dom";
@@ -100,5 +104,5 @@ const CourseDetail = () => {
     </main>
   );
 };
-
+// exports the component
 export default CourseDetail;

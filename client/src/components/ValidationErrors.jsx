@@ -1,3 +1,7 @@
+ /**
+   *validation error component that is used in other components when someone doesnot provide the correct validations
+   */
+  //importing props validator
 import PropTypes from 'prop-types'; 
 
 const ValidationErrors = ({ errors }) => {
@@ -19,5 +23,5 @@ const ValidationErrors = ({ errors }) => {
 ValidationErrors.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string).isRequired, // Expect an array of strings
 };
-
+// exports component
 export default ValidationErrors;

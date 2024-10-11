@@ -1,3 +1,7 @@
+ /**
+   *this component let's the user create a course
+   */
+//imports the hooks and reactcontext
 import { useState, useContext } from "react";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
@@ -111,5 +115,5 @@ const CreateCourse = () => {
     </main>
   );
 };
-
+// exports the component
 export default CreateCourse;

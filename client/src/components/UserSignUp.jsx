@@ -1,3 +1,7 @@
+ /**
+   * UsersignUp component that handles creating new users and handle form submissions
+   */
+  //Importing  hooks
 import { useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -123,5 +127,5 @@ const SignUp = () => {
     </main>
   );
 };
-
+//exports component
 export default SignUp;

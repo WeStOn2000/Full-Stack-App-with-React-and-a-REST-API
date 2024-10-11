@@ -1,3 +1,7 @@
+ /**
+   *this is the form that allows a user who already has an account to sign in and gets back to his home page 
+   */
+//imports reactcontext
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
@@ -78,5 +82,5 @@ const SignIn = () => {
     </main>
   );
 };
-
+//exports the component 
 export default SignIn;

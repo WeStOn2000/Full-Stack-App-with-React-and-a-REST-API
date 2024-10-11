@@ -1,9 +1,13 @@
+ /**
+   *this header component displays the initial layout of the web application and gives users to course details and access to submission forms 
+   */
+//imports the reactcontext component
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
 const Header = () => {
-  const { user } = useContext(UserContext);
+  const { user } = useContext(UserContext);// Getting data from userContext
 
   return (
     <header>
@@ -12,7 +16,7 @@ const Header = () => {
           <Link to="/">Courses</Link>
         </h1>
         <nav>
-          <ul className={user ? "header--signedin" : "header--signedout"}> {/* Conditional class */}
+          <ul className={user ? "header--signedin" : "header--signedout"}> 
             {user ? (
               <>
                 <li>Welcome, {user.firstName}</li>
@@ -36,5 +40,5 @@ const Header = () => {
     </header>
   );
 };
-
+//exports the component 
 export default Header;
