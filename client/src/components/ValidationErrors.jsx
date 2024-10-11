@@ -1,11 +1,10 @@
-// ValidationErrors.jsx
 import PropTypes from 'prop-types'; 
 
 const ValidationErrors = ({ errors }) => {
   return (
     errors.length > 0 && (
-      <div className="validation-errors">
-        <h2>Validation Errors</h2>
+      <div className="validation--errors">
+        <h3>Validation Errors</h3>
         <ul>
           {errors.map((error, index) => (
             <li key={index}>{error}</li>

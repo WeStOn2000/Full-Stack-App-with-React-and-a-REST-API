@@ -11,32 +11,27 @@ const CourseDetail = () => {
   const { user } = useContext(UserContext); // Access the Authenticated User
   const navigate = useNavigate();
 
-  // console.log("Course ID from URL: ", id);
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch course details only if the ID is valid
     if (id) {
-      //console.log('Id Param from URL: ', id);
       axios.get(`http://localhost:5000/api/courses/${id}`)
         .then(response => {
           const courseData = response.data;
           setCourse(courseData);
-          //console.log(response.data);
-          setLoading(false); // Stop loading once data is fetched
-          // return axios.get(`http://localhost:5000/api/user`)
+          setLoading(false);
         })
         .catch(error => {
           setError('Course not found',error);
-          setLoading(false); // Stop loading if there's an error
+          setLoading(false);
         });
     } else {
-      setLoading(false); // Stop loading if ID is invalid
+      setLoading(false);
       setError('Invalid course ID');
     }
-  }, [id]); // The dependency array should only include `id`
+  }, [id]);
 
   const handleDeleteCourse = async () => {
     if (window.confirm("Delete this course? (Action cannot be undone)")) {
@@ -51,11 +46,11 @@ const CourseDetail = () => {
         await axios(options);
         navigate("/");
       } catch (error) {
-        //console.error("Error deleting course:", error);
         setError("Failed to delete course",error);
       }
     }
   }
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
@@ -63,7 +58,6 @@ const CourseDetail = () => {
     <main>
       <div className="actions--bar">
         <div className="wrap">
-          {/* Conditionally render Update and Delete buttons */}
           {user && user.id === course.userId && (
             <>
               <Link className="button" to={`/courses/${id}/update`}>
@@ -87,7 +81,6 @@ const CourseDetail = () => {
             <div>
               <h3 className="course--detail--title">Course</h3>
               <h4 className="course--name">{course.title}</h4>
-              {/* <p>By {course.userId}</p> */}
               <p>By {course.User ? `${course.User.firstName} ${course.User.lastName}` : 'Unknown'}</p>
 
               <ReactMarkdown>{course.description}</ReactMarkdown>
@@ -98,7 +91,7 @@ const CourseDetail = () => {
 
               <h3 className="course--detail--title">Materials Needed</h3>
               <ul className="course--detail--list">
-              <ReactMarkdown>{course.materialsNeeded}</ReactMarkdown>
+                <ReactMarkdown>{course.materialsNeeded}</ReactMarkdown>
               </ul>
             </div>
           </div>

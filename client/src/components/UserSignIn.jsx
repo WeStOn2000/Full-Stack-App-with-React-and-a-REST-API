@@ -1,6 +1,5 @@
-import  { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// moved axios import to UserContext
 import { UserContext } from "../context/UserContext";
 
 const SignIn = () => {
@@ -18,37 +17,33 @@ const SignIn = () => {
       username: email,
       password: password,
     };
-    // Moved encoded credentials  and axios options to UserContext
-    
+
     try {
       const user = await actions.signInUser(credentials);
-
       if (user) {
         navigate("/");
       } else {
-        setError('Sign in was unsuccessful');
+        setError("Sign in was unsuccessful");
       }
     } catch (error) {
-      //console.log(error.response.status);
       if (error.response && error.response.status === 401) {
-        setError('Unauthorized: Incorrect email or password');
-        //console.log(error);
+        setError("Unauthorized: Incorrect email or password");
       } else {
-      console.log("Error: ", error);
-      navigate("/error");
-    }
+        console.log("Error: ", error);
+        navigate("/error");
+      }
     }
   };
 
   const handleCancel = () => {
-    navigate('/');
+    navigate("/");
   };
 
   return (
     <main>
       <div className="form--centered">
         <h2>Sign In</h2>
-        {error && <p style={{color:'red'}}>{error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <form onSubmit={handleSignIn}>
           <label htmlFor="emailAddress">Email Address</label>
           <input
@@ -58,15 +53,16 @@ const SignIn = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-          ></input>
+          />
           <label htmlFor="password">Password</label>
-          <input 
-            id="password" 
-            name="password" 
-            type="password" 
+          <input
+            id="password"
+            name="password"
+            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            ></input>
+            required
+          />
           <button className="button" type="submit">
             Sign In
           </button>
@@ -75,7 +71,7 @@ const SignIn = () => {
           </button>
         </form>
         <p>
-          if you do not have a user account? Click here to{" "}
+          Do not have a user account? Click here to{" "}
           <Link to="/signup">sign up</Link>!
         </p>
       </div>
