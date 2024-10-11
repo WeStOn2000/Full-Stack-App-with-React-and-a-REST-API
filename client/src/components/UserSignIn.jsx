@@ -1,19 +1,21 @@
- /**
-   *this is the form that allows a user who already has an account to sign in and gets back to his home page 
-   */
-//imports reactcontext
+/**
+ *this is the form that allows a user who already has an account to sign in and gets back to his home page
+ */
+//imports
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
 const SignIn = () => {
+  // State variables to store email, password, and error messages
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  // Access the actions from UserContext, particularly the signInUser method
   const { actions } = useContext(UserContext);
   const navigate = useNavigate();
 
-  // Event Handlers
+  // Event handler for signing in the user
   const handleSignIn = async (e) => {
     e.preventDefault();
 
@@ -23,6 +25,7 @@ const SignIn = () => {
     };
 
     try {
+      // Call the signInUser method with the user's credentials
       const user = await actions.signInUser(credentials);
       if (user) {
         navigate("/");
@@ -38,7 +41,7 @@ const SignIn = () => {
       }
     }
   };
-
+  // Handle the cancel button, which redirects to the home page
   const handleCancel = () => {
     navigate("/");
   };
@@ -82,5 +85,5 @@ const SignIn = () => {
     </main>
   );
 };
-//exports the component 
+//exports the component
 export default SignIn;

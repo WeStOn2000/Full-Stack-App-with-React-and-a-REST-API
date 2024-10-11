@@ -1,22 +1,22 @@
- /**
-   *this header component displays the initial layout of the web application and gives users to course details and access to submission forms 
-   */
+/**
+ *this header component displays the initial layout of the web application and gives users to course details and access to submission forms
+ */
 //imports the reactcontext component
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
 const Header = () => {
-  const { user } = useContext(UserContext);// Getting data from userContext
+  const { user } = useContext(UserContext); // Getting data from userContext
 
   return (
     <header>
-      <div className="wrap header--flex"> 
+      <div className="wrap header--flex">
         <h1 className="header--logo">
           <Link to="/">Courses</Link>
         </h1>
         <nav>
-          <ul className={user ? "header--signedin" : "header--signedout"}> 
+          <ul className={user ? "header--signedin" : "header--signedout"}>
             {user ? (
               <>
                 <li>Welcome, {user.firstName}</li>
@@ -40,5 +40,5 @@ const Header = () => {
     </header>
   );
 };
-//exports the component 
+//exports the component
 export default Header;

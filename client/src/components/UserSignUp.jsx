@@ -1,7 +1,7 @@
- /**
-   * UsersignUp component that handles creating new users and handle form submissions
-   */
-  //Importing  hooks
+/**
+ * UsersignUp component that handles creating new users and handle form submissions
+ */
+//Importing  hooks
 import { useRef, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -29,6 +29,16 @@ const SignUp = () => {
       emailAddress: username.current.value,
       password: password.current.value,
     };
+    //ensures all fields are filled
+    if (
+      !user.firstName ||
+      !user.lastName ||
+      !user.emailAddress ||
+      !user.password
+    ) {
+      setErrors(["All fields are required."]);
+      return;
+    }
 
     const options = {
       url: "http://localhost:5000/api/users",
@@ -44,31 +54,34 @@ const SignUp = () => {
       const response = await axios(options);
 
       if (response.status === 201) {
-        console.log(`${user.emailAddress} is successfully signed up.`);
-        // Automatically sign the user in after successful registration
-        const authUser = await actions.signInUser({
-          username: user.emailAddress,
-          password: user.password,
-        });
+        console.log(`${user.emailAddress} has successfully signed up.`);
+
+        // Automatically sign in the user after registration
+        const authUser = await actions.signInUser(
+          user.emailAddress,
+          user.password
+        );
+
         if (authUser) {
-          navigate("/");
+          navigate("/"); // Redirect to homepage upon successful sign-in
         } else {
-          setErrors(["Sign in was unsuccessful"]);
+          setErrors([
+            "Sign-in failed after registration. Please try signing in manually.",
+          ]);
         }
       }
     } catch (error) {
-      console.log("Caught Errors: ", error);
       if (error.response) {
-        console.log("Server Error: ", error.response.data);
-        setErrors(error.response.data.errors || ["An unexpected error occurred"]);
+        console.error("Server Error: ", error.response.data);
+        setErrors(
+          error.response.data.errors || ["An unexpected error occurred."]
+        );
       } else if (error.request) {
-        console.log("No response received: ", error.request);
+        console.error("No response received: ", error.request);
         setErrors(["No response from the server. Please try again later."]);
-        navigate("/error");
       } else {
-        console.log("Error setting up request: ", error.message);
+        console.error("Error setting up request: ", error.message);
         setErrors([error.message]);
-        navigate("/error");
       }
     }
   };
@@ -100,16 +113,40 @@ const SignUp = () => {
 
         <form onSubmit={handleSubmit}>
           <label htmlFor="firstName">First Name</label>
-          <input id="firstName" name="firstName" type="text" ref={firstname} required />
+          <input
+            id="firstName"
+            name="firstName"
+            type="text"
+            ref={firstname}
+            required
+          />
 
           <label htmlFor="lastName">Last Name</label>
-          <input id="lastName" name="lastName" type="text" ref={lastname} required />
+          <input
+            id="lastName"
+            name="lastName"
+            type="text"
+            ref={lastname}
+            required
+          />
 
           <label htmlFor="emailAddress">Email Address</label>
-          <input id="emailAddress" name="emailAddress" type="email" ref={username} required />
+          <input
+            id="emailAddress"
+            name="emailAddress"
+            type="email"
+            ref={username}
+            required
+          />
 
           <label htmlFor="password">Password</label>
-          <input id="password" name="password" type="password" ref={password} required />
+          <input
+            id="password"
+            name="password"
+            type="password"
+            ref={password}
+            required
+          />
 
           <button className="button" type="submit">
             Sign Up

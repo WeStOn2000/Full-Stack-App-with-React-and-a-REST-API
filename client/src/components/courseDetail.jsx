@@ -1,42 +1,48 @@
- /**
-   *Course detail component that contains the detail , deletes and updates courses 
+/**
+   *CourseDetail component displays detailed information about a specific course.
+ * It fetches the course data using the course ID from the URL parameters and renders the course details.
+ * If the course does not exist or the user does not have permission to view it, the component handles the error and redirects to appropriate pages (like 404 or forbidden).
+ * The user can also edit or delete the course if they are the course owner.
+
    */
-//importing hooks 
+//importing hooks
 import { useState, useEffect, useContext } from "react";
-import axios from 'axios';
+import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
-
 import { UserContext } from "../context/UserContext";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
 
 const CourseDetail = () => {
   const { id } = useParams(); // Retrieve the course ID from the URL
-  const { user } = useContext(UserContext); // Access the Authenticated User
+  const { authUser } = useContext(UserContext); // Access the Authenticated User
   const navigate = useNavigate();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  //Fetch course details when component mounts
   useEffect(() => {
     if (id) {
-      axios.get(`http://localhost:5000/api/courses/${id}`)
-        .then(response => {
+      axios
+        .get(`http://localhost:5000/api/courses/${id}`)
+        .then((response) => {
           const courseData = response.data;
           setCourse(courseData);
           setLoading(false);
         })
-        .catch(error => {
-          setError('Course not found',error);
+        .catch((error) => {
+          setError("Course not found", error);
           setLoading(false);
         });
     } else {
       setLoading(false);
-      setError('Invalid course ID');
+      setError("Invalid course ID");
     }
   }, [id]);
 
+  //handle course deletion
   const handleDeleteCourse = async () => {
     if (window.confirm("Delete this course? (Action cannot be undone)")) {
       try {
@@ -44,17 +50,17 @@ const CourseDetail = () => {
           method: "DELETE",
           url: `http://localhost:5000/api/courses/${id}`,
           headers: {
-            'Authorization' : `Basic ${user.authToken}`
-          }
+            Authorization: `Basic ${authUser.authToken}`,
+          },
         };
         await axios(options);
         navigate("/");
       } catch (error) {
-        setError("Failed to delete course",error);
+        setError("Failed to delete course", error);
       }
     }
-  }
-
+  };
+  //Handles loading and error states
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
 
@@ -62,7 +68,7 @@ const CourseDetail = () => {
     <main>
       <div className="actions--bar">
         <div className="wrap">
-          {user && user.id === course.userId && (
+          {authUser && authUser.id === course.userId && (
             <>
               <Link className="button" to={`/courses/${id}/update`}>
                 Update Course
@@ -85,7 +91,12 @@ const CourseDetail = () => {
             <div>
               <h3 className="course--detail--title">Course</h3>
               <h4 className="course--name">{course.title}</h4>
-              <p>By {course.User ? `${course.User.firstName} ${course.User.lastName}` : 'Unknown'}</p>
+              <p>
+                By{" "}
+                {course.User
+                  ? `${course.User.firstName} ${course.User.lastName}`
+                  : "Unknown"}
+              </p>
 
               <ReactMarkdown>{course.description}</ReactMarkdown>
             </div>
