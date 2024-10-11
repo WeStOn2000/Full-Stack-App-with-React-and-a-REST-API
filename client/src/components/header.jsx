@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
 const Header = () => {
-  const { user } = useContext(UserContext); // Getting data from userContext
+  const { authUser } = useContext(UserContext); // Getting data from userContext
 
   return (
     <header>
@@ -16,10 +16,10 @@ const Header = () => {
           <Link to="/">Courses</Link>
         </h1>
         <nav>
-          <ul className={user ? "header--signedin" : "header--signedout"}>
-            {user ? (
+          <ul className={authUser ? "header--signedin" : "header--signedout"}>
+            {authUser ? (
               <>
-                <li>Welcome, {user.firstName}</li>
+                <li>Welcome, {authUser.firstName}</li>
                 <li>
                   <Link to="/signout">Sign Out</Link>
                 </li>

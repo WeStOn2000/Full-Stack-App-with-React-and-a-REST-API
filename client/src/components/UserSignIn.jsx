@@ -28,11 +28,13 @@ const SignIn = () => {
       // Call the signInUser method with the user's credentials
       const user = await actions.signInUser(credentials);
       if (user) {
+        console.log('Signed in user:', user);
         navigate("/");
       } else {
         setError("Sign in was unsuccessful");
       }
     } catch (error) {
+      console.error("Sign in error:", error); 
       if (error.response && error.response.status === 401) {
         setError("Unauthorized: Incorrect email or password");
       } else {
