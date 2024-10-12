@@ -4,20 +4,31 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 const Courses = () => {
-  // State to hold the list of courses
+  // State to hold the list of courses and loading state
   const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true); // New loading state
+
   // useEffect hook to fetch the list of courses when the component is mounted
   useEffect(() => {
-    //Fetch the list of courses from the API
-    axios
-      .get("http://localhost:5000/api/courses")
-      .then((response) => {
+    // Fetch the list of courses from the API
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/courses");
         setCourses(response.data);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching courses: ", error);
-      });
+      } finally {
+        setLoading(false); // Set loading to false after data fetching
+      }
+    };
+
+    fetchCourses();
   }, []);
+
+  // Render loading indicator or courses
+  if (loading) {
+    return <div>Loading courses...</div>; // Loading message
+  }
 
   return (
     <main>
@@ -55,5 +66,6 @@ const Courses = () => {
     </main>
   );
 };
-//exports the component
+
+// Exports the component
 export default Courses;

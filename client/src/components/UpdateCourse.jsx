@@ -29,18 +29,20 @@ const UpdateCourse = () => {
         );
         const courseData = response.data;
 
-        if (courseData.userId !== authUser.id) {
-          navigate("/forbidden"); // Redirect to forbidden page if user is not the course owner
+        if (courseData.userId !== authUser?.id) {
+          setCourse(courseData); // Set the course data and show the CourseDetail if user is the owner
         } else {
-          setCourse(courseData);
+          navigate("/forbidden"); // Redirect to a forbidden page if user is not the course owner
         }
       } catch (error) {
         console.error("Error fetching course details", error);
-        navigate("/notfound"); // Redirect to not found page if course is not found
+        navigate("/notfound"); // Redirect to not found page if there's an error
       }
     };
-    fetchCourse();
-  }, [id, authUser.id, navigate]);
+    if (authUser) {
+      fetchCourse();
+    }
+  }, [id, authUser, navigate]);
   // Update the course state with the form input changes
   const handleChange = (e) => {
     setCourse({ ...course, [e.target.name]: e.target.value });
@@ -49,6 +51,7 @@ const UpdateCourse = () => {
   // Handle form submission to update the course details
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("AuthUser:", authUser); // Debugging
     try {
       await axios.put(
         `http://localhost:5000/api/courses/${id}`,
@@ -70,7 +73,7 @@ const UpdateCourse = () => {
     } catch (error) {
       if (error.response && error.response.status === 400) {
         setErrors(error.response.data.errors);
-      } else {
+      } else { 
         navigate("/error"); // Redirect to error page on server error
       }
     }
@@ -79,7 +82,7 @@ const UpdateCourse = () => {
   return (
     <div className="wrap">
       <h2>Update Course</h2>
-      <ValidationErrors errors={errors} />
+      {errors.length > 0 && <ValidationErrors errors={errors} />}
 
       <form onSubmit={handleSubmit}>
         <div className="main--flex">

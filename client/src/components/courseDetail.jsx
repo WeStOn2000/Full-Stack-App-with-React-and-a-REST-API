@@ -9,43 +9,53 @@ import ReactMarkdown from "react-markdown";
 // CourseDetail component displays detailed information about a specific course
 const CourseDetail = () => {
   const { id } = useParams(); // Retrieve the course ID from the URL
-  const { authUser } = useContext(UserContext); // Access the authenticated user
-  const navigate = useNavigate(); // Hook to programmatically navigate
+  const { authUser } = useContext(UserContext); // Access the authenticated user from UserContext
+  const navigate = useNavigate(); // Hook to programmatically navigate between routes
 
   // State variables for course data, loading status, and error handling
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [course, setCourse] = useState(null); // State to hold course data
+  const [loading, setLoading] = useState(true); // State to manage loading status
+  const [error, setError] = useState(null); // State to hold error messages
 
   // Fetch course details when the component mounts or when the course ID changes
   useEffect(() => {
+    const fetchCourseData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/courses/${id}`);
+        const courseData = response.data;
+        console.log(courseData); // Log the response for debugging
+
+        // Set course data and loading state
+        setCourse(courseData);
+
+        // Check if authUser is defined and matches course owner
+        if (authUser && courseData.user && courseData.user.id !== authUser.id) {
+          navigate("/forbidden"); // Redirect to forbidden if not the owner
+        }
+      } catch {
+        setError("Course not found"); // Set error message if the course is not found
+      } finally {
+        setLoading(false); // Set loading to false after fetching data
+      }
+    };
+
     if (id) {
-      axios
-        .get(`http://localhost:5000/api/courses/${id}`)
-        .then((response) => {
-          const courseData = response.data; // Retrieve course data from the response
-          setCourse(courseData); // Set course data to state
-          setLoading(false); // Set loading to false
-        })
-        .catch(() => {
-          setError("Course not found"); // Set error message if the course is not found
-          setLoading(false); // Set loading to false
-        });
+      fetchCourseData(); // Fetch course data only if the ID is valid
     } else {
       setLoading(false); // If there's no ID, stop loading
       setError("Invalid course ID"); // Set error message for invalid course ID
     }
-  }, [id]);
+  }, [id, authUser, navigate]); // Include authUser and navigate in the dependency array
 
   // Handle course deletion
   const handleDeleteCourse = async () => {
     // Confirm deletion from the user
     if (window.confirm("Delete this course? (Action cannot be undone)")) {
       try {
-        // Send DELETE request to the API
+        // Send DELETE request to the API to remove the course
         await axios.delete(`http://localhost:5000/api/courses/${id}`, {
           headers: {
-            Authorization: `Basic ${authUser.authToken}`, // Include authorization token
+            Authorization: `Basic ${authUser.authToken}`, // Include authorization token for authentication
           },
         });
         navigate("/"); // Navigate back to the course list after deletion
@@ -56,8 +66,8 @@ const CourseDetail = () => {
   };
 
   // Handles loading and error states
-  if (loading) return <p>Loading...</p>; // Display loading message
-  if (error) return <p>{error}</p>; // Display error message
+  if (loading) return <p>Loading...</p>; // Display loading message while fetching data
+  if (error) return <p>{error}</p>; // Display error message if there's an error
 
   return (
     <>
@@ -65,18 +75,19 @@ const CourseDetail = () => {
         {/* Action buttons for updating and deleting course */}
         <div className="actions--bar">
           <div className="wrap">
-            {authUser && authUser.id === course.userId && ( // Check if the user is the course owner
+            {authUser && authUser.id === course.user.id && ( // Check if the authenticated user is the course owner
               <>
                 <Link className="button" to={`/courses/${id}/update`}>
-                  Update Course
+                  Update Course{" "} 
+                  {/* Button to navigate to update course page */}
                 </Link>
                 <button className="button" onClick={handleDeleteCourse}>
-                  Delete Course
+                  Delete Course {/* Button to delete the course */}
                 </button>
               </>
             )}
             <Link className="button button-secondary" to="/">
-              Return to List
+              Return to List {/* Button to return to the course list */}
             </Link>
           </div>
         </div>
@@ -87,18 +98,25 @@ const CourseDetail = () => {
           <div className="main--flex">
             <div>
               <h3 className="course--detail--title">Course</h3>
-              <h4 className="course--name">{course.title}</h4> {/* Display course title */}
+              <h4 className="course--name">{course.title}</h4>{" "} 
+              {/* Display course title */}
               <p>
-                By {course.User ? `${course.User.firstName} ${course.User.lastName}` : "Unknown"} {/* Display course author */}
+                By{" "}
+                {course.user
+                  ? `${course.user.firstName} ${course.user.lastName}` // Display course author name
+                  : "Unknown"}
               </p>
-              <ReactMarkdown>{course.description}</ReactMarkdown> {/* Render course description using ReactMarkdown */}
+              <ReactMarkdown>{course.description}</ReactMarkdown>{" "}
+              {/* Render course description using ReactMarkdown */}
             </div>
             <div>
               <h3 className="course--detail--title">Estimated Time</h3>
-              <p>{course.estimatedTime}</p> {/* Display estimated time for the course */}
+              <p>{course.estimatedTime}</p>{" "} 
+              {/* Display estimated time for the course */}
               <h3 className="course--detail--title">Materials Needed</h3>
               <ul className="course--detail--list">
-                <ReactMarkdown>{course.materialsNeeded}</ReactMarkdown> {/* Render materials needed using ReactMarkdown */}
+                <ReactMarkdown>{course.materialsNeeded}</ReactMarkdown>{" "}
+                {/* Render materials needed using ReactMarkdown */}
               </ul>
             </div>
           </div>

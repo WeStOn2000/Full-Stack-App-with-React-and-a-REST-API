@@ -32,6 +32,28 @@ const CreateCourse = () => {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
+  
+    // Check for empty fields
+    const validationErrors = [];
+    if (!course.title) {
+      validationErrors.push({ message: "Course title is required." });
+    }
+    if (!course.description) {
+      validationErrors.push({ message: "Course description is required." });
+    }
+    if (!course.estimatedTime) {
+      validationErrors.push({ message: "Estimated time is required." });
+    }
+    if (!course.materialsNeeded) {
+      validationErrors.push({ message: "Materials needed is required." });
+    }
+  
+    // If there are validation errors, update state and return early
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+  
     try {
       const response = await axios.post(
         "http://localhost:5000/api/courses", // API endpoint for creating courses
@@ -43,6 +65,7 @@ const CreateCourse = () => {
           },
         }
       );
+  
       if (response.status === 201) {
         const { courseId } = response.data; // Get course ID from response
         navigate(`/courses/${courseId}`); // Redirect to the new course detail page
@@ -62,6 +85,7 @@ const CreateCourse = () => {
       }
     }
   };
+  
 
   // Function to handle cancel button click
   const handleCancel = (e) => {
