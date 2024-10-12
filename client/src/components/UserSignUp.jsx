@@ -30,14 +30,14 @@ const SignUp = () => {
    * @param {Event} e - The submit event
    */
  const handleSubmit = async (e) => {
-  e.preventDefault(); // Prevent the default form submission behavior
+  e.preventDefault(); // Prevent default form submission behavior
 
   // Collect user input from form fields
   const user = {
-    firstName: firstNameRef.current.value.trim(),
-    lastName: lastNameRef.current.value.trim(),
-    emailAddress: emailRef.current.value.trim(),
-    password: passwordRef.current.value.trim(),
+      firstName: firstNameRef.current.value.trim(),
+      lastName: lastNameRef.current.value.trim(),
+      emailAddress: emailRef.current.value.trim(),
+      password: passwordRef.current.value.trim(),
   };
 
   // Validate form inputs
@@ -49,47 +49,44 @@ const SignUp = () => {
 
   // If there are validation errors, set them and exit the function
   if (validationErrors.length > 0) {
-    setErrors(validationErrors);
-    return;
+      setErrors(validationErrors);
+      return;
   }
 
   try {
-    // Send a POST request to the server to create a new user
-    const response = await axios.post("http://localhost:5000/api/users", user);
+      // Send a POST request to the server to create a new user
+      const response = await axios.post("http://localhost:5000/api/users", user);
 
-    // Check if the response status indicates successful creation
-    if (response.status === 201) {
-      console.log(`${user.emailAddress} has successfully signed up.`);
-      setErrors([]); // Clear any existing errors
+      // Check if the response status indicates successful creation
+      if (response.status === 201) {
+          console.log(`${user.emailAddress} has successfully signed up.`);
+          setErrors([]); // Clear any existing errors
+          
+          // Navigate to the home page immediately after sign-up
+          navigate("/"); 
 
-      // Automatically sign in the user after successful sign-up
-      const authUser = await actions.signInUser(user.emailAddress, user.password);
-
-      // Check if sign-in was successful
-      if (authUser) {
-        navigate("/"); // Navigate to the homepage on successful sign-in
-      } else {
-        // Handle failed sign-in
-        setErrors(["Sign-in failed after registration. Please try signing in manually."]);
+          // Optionally attempt to sign in
+          const authUser = await actions.signInUser(user.emailAddress, user.password);
+          if (!authUser) {
+              setErrors(["Sign-in failed after registration. Please try signing in manually."]);
+          }
       }
-    }
   } catch (error) {
-    // Handle any errors that occur during the sign-up process
-    if (error.response) {
-      console.error("Server Error: ", error.response.data);
-      // Set server errors or a generic error message
-      const serverErrors = error.response.data.errors || ["An unexpected error occurred."];
-      setErrors(serverErrors);
-    } else if (error.request) {
-      console.error("No response received: ", error.request);
-      setErrors(["No response from the server. Please try again later."]);
-    } else {
-      console.error("Error setting up request: ", error.message);
-      setErrors([error.message]);
-    }
+      // Handle any errors that occur during the sign-up process
+      if (error.response) {
+          console.error("Server Error: ", error.response.data);
+          const serverErrors = error.response.data.errors || ["An unexpected error occurred."];
+          setErrors(serverErrors.map(err => err.message || err)); // Adjust based on the structure
+      } else if (error.request) {
+          console.error("No response received: ", error.request);
+          setErrors(["No response from the server. Please try again later."]);
+      } else {
+          console.error("Error setting up request: ", error.message);
+          setErrors([error.message]);
+      }
   }
 };
-  
+
 
   /**
    * Handles cancellation of the sign-up process by navigating back to the home page.

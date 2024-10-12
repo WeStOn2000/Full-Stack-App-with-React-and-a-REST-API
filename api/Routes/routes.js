@@ -15,12 +15,22 @@ const asyncHandler = (cb) => {
 };
 
 // GET /api/users 
-router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
+router.get('/users', authenticateUser ,asyncHandler(async (req, res) => {
+  if (!req.currentUser) {
+    return res.status(401).json({ message: 'Unauthorized access' });
+  }
+
   const user = await User.findByPk(req.currentUser.id, {
     attributes: ['id', 'firstName', 'lastName', 'emailAddress']
   });
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
   res.status(200).json(user);
 }));
+
 
 // POST /api/users
 router.post('/users', asyncHandler(async (req, res) => {
@@ -70,12 +80,17 @@ router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
     ...req.body,
     userId: req.currentUser.id
   });
-  res.location(`/api/courses/${course.id}`).status(201).end();
+  
+  // Send the course ID in the response
+  res.status(201).json({ courseId: course.id }); // Ensure this line sends the course ID back
 }));
+
 
 // PUT /api/courses/:id 
 router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
-  (['title', 'description'], req.body);
+  if (!req.body.title || !req.body.description) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
   const course = await Course.findByPk(req.params.id);
   if (course) {
     if (course.userId !== req.currentUser.id) {
@@ -87,6 +102,7 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
     res.status(404).json({ message: 'Course not found' });
   }
 }));
+
 
 // DELETE /api/courses/:id 
 router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
