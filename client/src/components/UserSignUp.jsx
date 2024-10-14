@@ -2,18 +2,14 @@
  * UserSignUp component that handles creating new users and managing form submissions.
  */
 
-// Import necessary hooks and libraries
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios"; // Used for making HTTP requests
-import { UserContext } from "../context/UserContext"; // Context to handle user-related actions
+import axios from "axios";
+import { UserContext } from "../context/UserContext";
 import ValidationErrors from "./ValidationErrors";
 
 const SignUp = () => {
-  // Use navigate hook to programmatically navigate to different routes
   const navigate = useNavigate();
-
-  // Destructure actions from the UserContext
   const { actions } = useContext(UserContext);
 
   // State to store validation errors and user input
@@ -24,13 +20,19 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
 
   /**
+   * Checks if an email already exists in the system
+   * @param {string} email - The email to check
+   * @returns {Promise<boolean>} Whether the email exists
+   */
+
+
+  /**
    * Handles form submission for user sign-up
    * @param {Event} e - The submit event
    */
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
 
-    // Collect user input from form fields
     const user = {
       firstName,
       lastName,
@@ -38,29 +40,33 @@ const SignUp = () => {
       password,
     };
 
-    try {
-      // Send a POST request to the server to create a new user
+
+      try{
+      // Send a POST request to create a new user
       const response = await axios.post("http://localhost:5000/api/users", user);
 
-      // Check if the response status indicates successful creation
       if (response.status === 201) {
         console.log(`${user.emailAddress} has successfully signed up.`);
-        setErrors([]); // Clear any existing errors
+        setErrors([]);
 
-        // Optionally attempt to sign in
-        const authUser = await actions.signInUser(user.emailAddress, user.password);
+        // Attempt to sign in the newly created user
+        const authUser = await actions.signInUser(emailAddress, password);
         if (authUser) {
           navigate("/");
-        }else {
+        } else {
           setErrors(["Sign-in failed after registration. Please try signing in manually."]);
         }
       }
     } catch (error) {
-      // Handle any errors that occur during the sign-up process
       if (error.response) {
         console.error("Server Error: ", error.response.data);
-        const serverErrors = error.response.data.errors || ["An unexpected error occurred."];
-        setErrors(serverErrors.map(err => err.message || err)); // Adjust based on the structure
+        if (error.response.status === 400 && error.response.data.message === "The email address you entered already exists") {
+          setErrors(["The email address you entered is already registered. Please use a different email or try signing in."]);
+        } else {
+          // Handle other types of server errors
+          const serverErrors = error.response.data.errors || [error.response.data.message || "An unexpected error occurred."];
+          setErrors(Array.isArray(serverErrors) ? serverErrors : [serverErrors]);
+        }
       } else if (error.request) {
         console.error("No response received: ", error.request);
         setErrors(["No response from the server. Please try again later."]);
@@ -75,8 +81,8 @@ const SignUp = () => {
    * Handles cancellation of the sign-up process by navigating back to the home page.
    */
   const handleCancel = (e) => {
-    e.preventDefault(); // Prevent default link behavior
-    navigate("/"); // Navigate to the home page
+    e.preventDefault();
+    navigate("/");
   };
 
   return (
@@ -84,7 +90,7 @@ const SignUp = () => {
       <div className="form--centered">
         <h2>Sign Up</h2>
 
-        {/* Display validation errors, if any */}
+        {/* Display validation errors if there are any */}
         {errors.length > 0 && <ValidationErrors errors={errors} />}
 
         {/* Form to capture user details for signing up */}
@@ -95,7 +101,7 @@ const SignUp = () => {
             name="firstName" 
             type="text" 
             value={firstName} 
-            onChange={(e) => setFirstName(e.target.value)} // Use state management for inputs
+            onChange={(e) => setFirstName(e.target.value)}
             required 
           />
 
@@ -105,7 +111,7 @@ const SignUp = () => {
             name="lastName" 
             type="text" 
             value={lastName} 
-            onChange={(e) => setLastName(e.target.value)} // Use state management for inputs
+            onChange={(e) => setLastName(e.target.value)}
             required 
           />
 
@@ -115,7 +121,7 @@ const SignUp = () => {
             name="emailAddress" 
             type="email" 
             value={emailAddress} 
-            onChange={(e) => setEmailAddress(e.target.value)} // Use state management for inputs
+            onChange={(e) => setEmailAddress(e.target.value)}
             required 
           />
 
@@ -125,18 +131,14 @@ const SignUp = () => {
             name="password" 
             type="password" 
             value={password} 
-            onChange={(e) => setPassword(e.target.value)} // Use state management for inputs
+            onChange={(e) => setPassword(e.target.value)}
             required 
           />
 
-          {/* Submit button to sign up */}
           <button className="button" type="submit">Sign Up</button>
-
-          {/* Cancel button to discard form and go back to home page */}
           <button className="button button-secondary" onClick={handleCancel}>Cancel</button>
         </form>
 
-        {/* Link to sign-in page if the user already has an account */}
         <p>
           Already have a user account? Click here to <Link to="/signin">sign in</Link>!
         </p>
@@ -145,5 +147,4 @@ const SignUp = () => {
   );
 };
 
-// Export the SignUp component
 export default SignUp;
