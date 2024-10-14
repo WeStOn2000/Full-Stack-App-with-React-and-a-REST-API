@@ -3,7 +3,7 @@
  */
 
 // Import necessary hooks and libraries
-import { useRef, useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios"; // Used for making HTTP requests
 import { UserContext } from "../context/UserContext"; // Context to handle user-related actions
@@ -16,77 +16,60 @@ const SignUp = () => {
   // Destructure actions from the UserContext
   const { actions } = useContext(UserContext);
 
-  // State to store validation errors
+  // State to store validation errors and user input
   const [errors, setErrors] = useState([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
+  const [password, setPassword] = useState('');
 
-  // useRef to access form input values directly without causing re-renders
-  const firstNameRef = useRef(null);
-  const lastNameRef = useRef(null);
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
-
- /**
+  /**
    * Handles form submission for user sign-up
    * @param {Event} e - The submit event
    */
- const handleSubmit = async (e) => {
-  e.preventDefault(); // Prevent default form submission behavior
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission behavior
 
-  // Collect user input from form fields
-  const user = {
-      firstName: firstNameRef.current.value.trim(),
-      lastName: lastNameRef.current.value.trim(),
-      emailAddress: emailRef.current.value.trim(),
-      password: passwordRef.current.value.trim(),
-  };
+    // Collect user input from form fields
+    const user = {
+      firstName,
+      lastName,
+      emailAddress,
+      password,
+    };
 
-  // Validate form inputs
-  const validationErrors = [];
-  if (!user.firstName) validationErrors.push("First Name is required.");
-  if (!user.lastName) validationErrors.push("Last Name is required.");
-  if (!user.emailAddress) validationErrors.push("Email Address is required.");
-  if (!user.password) validationErrors.push("Password is required.");
-
-  // If there are validation errors, set them and exit the function
-  if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-  }
-
-  try {
+    try {
       // Send a POST request to the server to create a new user
       const response = await axios.post("http://localhost:5000/api/users", user);
 
       // Check if the response status indicates successful creation
       if (response.status === 201) {
-          console.log(`${user.emailAddress} has successfully signed up.`);
-          setErrors([]); // Clear any existing errors
-          
-          // Navigate to the home page immediately after sign-up
-          navigate("/"); 
+        console.log(`${user.emailAddress} has successfully signed up.`);
+        setErrors([]); // Clear any existing errors
 
-          // Optionally attempt to sign in
-          const authUser = await actions.signInUser(user.emailAddress, user.password);
-          if (!authUser) {
-              setErrors(["Sign-in failed after registration. Please try signing in manually."]);
-          }
+        // Optionally attempt to sign in
+        const authUser = await actions.signInUser(user.emailAddress, user.password);
+        if (authUser) {
+          navigate("/");
+        }else {
+          setErrors(["Sign-in failed after registration. Please try signing in manually."]);
+        }
       }
-  } catch (error) {
+    } catch (error) {
       // Handle any errors that occur during the sign-up process
       if (error.response) {
-          console.error("Server Error: ", error.response.data);
-          const serverErrors = error.response.data.errors || ["An unexpected error occurred."];
-          setErrors(serverErrors.map(err => err.message || err)); // Adjust based on the structure
+        console.error("Server Error: ", error.response.data);
+        const serverErrors = error.response.data.errors || ["An unexpected error occurred."];
+        setErrors(serverErrors.map(err => err.message || err)); // Adjust based on the structure
       } else if (error.request) {
-          console.error("No response received: ", error.request);
-          setErrors(["No response from the server. Please try again later."]);
+        console.error("No response received: ", error.request);
+        setErrors(["No response from the server. Please try again later."]);
       } else {
-          console.error("Error setting up request: ", error.message);
-          setErrors([error.message]);
+        console.error("Error setting up request: ", error.message);
+        setErrors([error.message]);
       }
-  }
-};
-
+    }
+  };
 
   /**
    * Handles cancellation of the sign-up process by navigating back to the home page.
@@ -107,16 +90,44 @@ const SignUp = () => {
         {/* Form to capture user details for signing up */}
         <form onSubmit={handleSubmit}>
           <label htmlFor="firstName">First Name</label>
-          <input id="firstName" name="firstName" type="text" ref={firstNameRef} />
+          <input 
+            id="firstName" 
+            name="firstName" 
+            type="text" 
+            value={firstName} 
+            onChange={(e) => setFirstName(e.target.value)} // Use state management for inputs
+            required 
+          />
 
           <label htmlFor="lastName">Last Name</label>
-          <input id="lastName" name="lastName" type="text" ref={lastNameRef} />
+          <input 
+            id="lastName" 
+            name="lastName" 
+            type="text" 
+            value={lastName} 
+            onChange={(e) => setLastName(e.target.value)} // Use state management for inputs
+            required 
+          />
 
           <label htmlFor="emailAddress">Email Address</label>
-          <input id="emailAddress" name="emailAddress" type="email" ref={emailRef} />
+          <input 
+            id="emailAddress" 
+            name="emailAddress" 
+            type="email" 
+            value={emailAddress} 
+            onChange={(e) => setEmailAddress(e.target.value)} // Use state management for inputs
+            required 
+          />
 
           <label htmlFor="password">Password</label>
-          <input id="password" name="password" type="password" ref={passwordRef} />
+          <input 
+            id="password" 
+            name="password" 
+            type="password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} // Use state management for inputs
+            required 
+          />
 
           {/* Submit button to sign up */}
           <button className="button" type="submit">Sign Up</button>

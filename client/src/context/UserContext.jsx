@@ -20,6 +20,8 @@ export const UserProvider = ({ children }) => {
         Authorization: `Basic ${encodedCredentials}`,
       },
     };
+    console.log("Authorization Header:", options.headers.Authorization); // Debugging line
+    
     // Make the API request to get user data
     const response = await axios(options);
     // If the request is successful (status 200), set the user and return it
@@ -29,7 +31,7 @@ export const UserProvider = ({ children }) => {
       setAuthUser(user);
       return user;
     } else {
-      return null;
+  return null;
     }
   };
   // Function to sign out the user

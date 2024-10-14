@@ -20,18 +20,6 @@ const SignIn = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
 
-    const validationErrors = [];
-
-    // Check if email or password fields are empty
-    if (!email) validationErrors.push("Email address is required.");
-    if (!password) validationErrors.push("Password is required.");
-
-    // If there are validation errors, set them and return early
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
     const credentials = {
       username: email,
       password: password,

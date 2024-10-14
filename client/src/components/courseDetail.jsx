@@ -21,17 +21,14 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/courses/${id}`);
+        const response = await axios.get(
+          `http://localhost:5000/api/courses/${id}`
+        );
         const courseData = response.data;
         console.log(courseData); // Log the response for debugging
 
         // Set course data and loading state
         setCourse(courseData);
-
-        // Check if authUser is defined and matches course owner
-        if (authUser && courseData.user && courseData.user.id !== authUser.id) {
-          navigate("/forbidden"); // Redirect to forbidden if not the owner
-        }
       } catch {
         setError("Course not found"); // Set error message if the course is not found
       } finally {
@@ -75,17 +72,18 @@ const CourseDetail = () => {
         {/* Action buttons for updating and deleting course */}
         <div className="actions--bar">
           <div className="wrap">
-            {authUser && authUser.id === course.user.id && ( // Check if the authenticated user is the course owner
-              <>
-                <Link className="button" to={`/courses/${id}/update`}>
-                  Update Course{" "} 
-                  {/* Button to navigate to update course page */}
-                </Link>
-                <button className="button" onClick={handleDeleteCourse}>
-                  Delete Course {/* Button to delete the course */}
-                </button>
-              </>
-            )}
+            {authUser &&
+              authUser.id === course.user.id && ( // Check if the authenticated user is the course owner
+                <>
+                  <Link className="button" to={`/courses/${id}/update`}>
+                    Update Course{" "}
+                    {/* Button to navigate to update course page */}
+                  </Link>
+                  <button className="button" onClick={handleDeleteCourse}>
+                    Delete Course {/* Button to delete the course */}
+                  </button>
+                </>
+              )}
             <Link className="button button-secondary" to="/">
               Return to List {/* Button to return to the course list */}
             </Link>
@@ -98,7 +96,7 @@ const CourseDetail = () => {
           <div className="main--flex">
             <div>
               <h3 className="course--detail--title">Course</h3>
-              <h4 className="course--name">{course.title}</h4>{" "} 
+              <h4 className="course--name">{course.title}</h4>{" "}
               {/* Display course title */}
               <p>
                 By{" "}
@@ -111,7 +109,7 @@ const CourseDetail = () => {
             </div>
             <div>
               <h3 className="course--detail--title">Estimated Time</h3>
-              <p>{course.estimatedTime}</p>{" "} 
+              <p>{course.estimatedTime}</p>{" "}
               {/* Display estimated time for the course */}
               <h3 className="course--detail--title">Materials Needed</h3>
               <ul className="course--detail--list">

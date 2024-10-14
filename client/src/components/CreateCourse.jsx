@@ -23,6 +23,7 @@ const CreateCourse = () => {
 
   // Function to handle changes in the form fields
   const handleChange = (e) => {
+    // Update the course state with the new value for the changed field
     setCourse({
       ...course,
       [e.target.name]: e.target.value, // Update the respective field in course state
@@ -32,29 +33,9 @@ const CreateCourse = () => {
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
-  
-    // Check for empty fields
-    const validationErrors = [];
-    if (!course.title) {
-      validationErrors.push({ message: "Course title is required." });
-    }
-    if (!course.description) {
-      validationErrors.push({ message: "Course description is required." });
-    }
-    if (!course.estimatedTime) {
-      validationErrors.push({ message: "Estimated time is required." });
-    }
-    if (!course.materialsNeeded) {
-      validationErrors.push({ message: "Materials needed is required." });
-    }
-  
-    // If there are validation errors, update state and return early
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-  
+
     try {
+      // Send a POST request to create a new course
       const response = await axios.post(
         "http://localhost:5000/api/courses", // API endpoint for creating courses
         course, // Course data to be sent
@@ -65,7 +46,8 @@ const CreateCourse = () => {
           },
         }
       );
-  
+
+      // If the course is created successfully (status code 201)
       if (response.status === 201) {
         const { courseId } = response.data; // Get course ID from response
         navigate(`/courses/${courseId}`); // Redirect to the new course detail page
@@ -73,19 +55,20 @@ const CreateCourse = () => {
     } catch (error) {
       // Handle errors from the API
       if (error.response) {
-        if (error.response.status === 400 && error.response.data.message.errors) {
-          setErrors(error.response.data.message.errors); // Set validation errors
+        // Check if the error has a response from the server
+        if (error.response.status === 400) {
+          // If a 400 (bad request) error, extract validation errors
+          setErrors(error.response.data.errors || ["Validation error occurred."]); // Set validation errors
         } else {
+          // Handle other unexpected errors
           setErrors(["An unexpected error occurred."]); // Handle unexpected errors
-          navigate("/error"); // Redirect to error page
         }
       } else {
+        // Handle network issues
         setErrors(["No response from the server."]); // Handle network issues
-        navigate("/error"); // Redirect to error page
       }
     }
   };
-  
 
   // Function to handle cancel button click
   const handleCancel = (e) => {
@@ -97,16 +80,18 @@ const CreateCourse = () => {
     <main>
       <div className="wrap">
         <h2>Create Course</h2>
+        {/* Display validation errors if any */}
         {errors.length > 0 && (
           <div className="validation--errors">
             <h3>Validation Errors</h3>
             <ul>
               {errors.map((error, index) => (
-                <li key={index}>{error.message}</li>
+                <li key={index}>{error}</li> // Display each error message
               ))}
             </ul>
           </div>
         )}
+
         <form onSubmit={handleSubmit}>
           <div className="main--flex">
             <div>
@@ -116,7 +101,7 @@ const CreateCourse = () => {
                 name="title" // Use "title" to match the state
                 type="text"
                 value={course.title}
-                onChange={handleChange}
+                onChange={handleChange} // Handle changes in the title input
               />
               <p>
                 By {authUser.firstName} {authUser.lastName} {/* Display user's name */}
@@ -127,7 +112,7 @@ const CreateCourse = () => {
                 id="courseDescription"
                 name="description" // Use "description" to match the state
                 value={course.description}
-                onChange={handleChange}
+                onChange={handleChange} // Handle changes in the description textarea
               ></textarea>
             </div>
             <div>
@@ -137,7 +122,7 @@ const CreateCourse = () => {
                 name="estimatedTime" // Use "estimatedTime" to match the state
                 type="text"
                 value={course.estimatedTime}
-                onChange={handleChange}
+                onChange={handleChange} // Handle changes in the estimated time input
               />
 
               <label htmlFor="materialsNeeded">Materials Needed</label>
@@ -145,15 +130,15 @@ const CreateCourse = () => {
                 id="materialsNeeded"
                 name="materialsNeeded" // Use "materialsNeeded" to match the state
                 value={course.materialsNeeded}
-                onChange={handleChange}
+                onChange={handleChange} // Handle changes in the materials needed textarea
               ></textarea>
             </div>
           </div>
           <button className="button" type="submit">
-            Create Course
+            Create Course {/* Button to submit the form */}
           </button>
           <button className="button button-secondary" onClick={handleCancel}>
-            Cancel
+            Cancel {/* Button to cancel course creation and navigate home */}
           </button>
         </form>
       </div>

@@ -24,25 +24,25 @@ const UpdateCourse = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:5000/api/courses/${id}`
-        );
+        const response = await axios.get(`http://localhost:5000/api/courses/${id}`);
         const courseData = response.data;
-
-        if (courseData.userId !== authUser?.id) {
-          setCourse(courseData); // Set the course data and show the CourseDetail if user is the owner
+  
+        if (courseData.userId !== authUser?.id) { // Correct ownership check
+          setCourse(courseData);
         } else {
-          navigate("/forbidden"); // Redirect to a forbidden page if user is not the course owner
+          navigate("/forbidden"); // Redirect if not the course owner
         }
       } catch (error) {
         console.error("Error fetching course details", error);
-        navigate("/notfound"); // Redirect to not found page if there's an error
+        navigate("/notfound"); // Redirect on error
       }
     };
+  
     if (authUser) {
       fetchCourse();
     }
   }, [id, authUser, navigate]);
+  
   // Update the course state with the form input changes
   const handleChange = (e) => {
     setCourse({ ...course, [e.target.name]: e.target.value });
