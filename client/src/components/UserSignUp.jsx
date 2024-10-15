@@ -26,11 +26,13 @@ const SignUp = () => {
     const newErrors = []; // Initialize an array to hold error messages
 
     // Validate each field and push error messages if any field is invalid
-    if (!firstName.trim()) newErrors.push("Please provide a value for 'First Name'");
-    if (!lastName.trim()) newErrors.push("Please provide a value for 'Last Name'");
-    if (!emailAddress.trim() || !/\S+@\S+\.\S+/.test(emailAddress)) 
+    if (!firstName.trim())
+      newErrors.push("Please provide a value for 'First Name'");
+    if (!lastName.trim())
+      newErrors.push("Please provide a value for 'Last Name'");
+    if (!emailAddress.trim() || !/\S+@\S+\.\S+/.test(emailAddress))
       newErrors.push("Please provide a valid email address");
-    if (!password.trim()) 
+    if (!password.trim())
       newErrors.push("Please provide a value for 'Password'");
     // Optional: Add a maximum length check to prevent excessively long passwords
     if (password.length > 255)
@@ -53,7 +55,8 @@ const SignUp = () => {
       return; // Stop submission if there are errors
     }
 
-    const user = { // Create user object from state
+    const user = {
+      // Create user object from state
       firstName,
       lastName,
       emailAddress,
@@ -62,9 +65,13 @@ const SignUp = () => {
 
     try {
       // Send a POST request to create a new user
-      const response = await axios.post("http://localhost:5000/api/users", user);
+      const response = await axios.post(
+        "http://localhost:5000/api/users",
+        user
+      );
 
-      if (response.status === 201) { // Check if the response status is successful
+      if (response.status === 201) {
+        // Check if the response status is successful
         console.log(`${user.emailAddress} has successfully signed up.`);
         setErrors([]); // Clear any existing errors upon successful sign-up
 
@@ -73,13 +80,18 @@ const SignUp = () => {
         if (authUser) {
           navigate("/"); // Redirect to the homepage on successful login
         } else {
-          setErrors(["Sign-in failed after registration. Please try signing in manually."]); // Handle sign-in failure
+          setErrors([
+            "Sign-in failed after registration. Please try signing in manually.",
+          ]); // Handle sign-in failure
         }
       }
     } catch (error) {
-      if (error.response) { // Handle server-side errors
+      if (error.response) {
+        // Handle server-side errors
         if (error.response.status === 400) {
-          setErrors(error.response.data.errors || ["Validation error occurred."]); // Set server validation errors
+          setErrors(
+            error.response.data.errors || ["Validation error occurred."]
+          ); // Set server validation errors
         } else {
           setErrors(["An unexpected error occurred."]); // Handle other unexpected errors
         }
@@ -105,10 +117,9 @@ const SignUp = () => {
         <h2>Sign Up</h2>
 
         {/* Display validation errors only after form submission */}
-        <div className="validation--errors">
-            <h3>Validation Errors</h3>
-        {isSubmitted && errors.length > 0 && <ValidationErrors errors={errors} />}
-        </div>
+        {isSubmitted && errors.length > 0 && (
+          <ValidationErrors errors={errors} />
+        )}
 
         {/* Form to capture user details for signing up */}
         <form onSubmit={handleSubmit}>
@@ -152,7 +163,7 @@ const SignUp = () => {
           <button className="button" type="submit">
             Sign Up
           </button>
-          
+
           {/* Cancel button */}
           <button className="button button-secondary" onClick={handleCancel}>
             Cancel

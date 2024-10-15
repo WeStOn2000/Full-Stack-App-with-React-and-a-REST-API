@@ -124,10 +124,8 @@ useEffect(() => {
     <div className="wrap">
       <h2>Update Course</h2>
       {/* Display validation errors only after form submission */}
-      <div className="validation--errors">
-            <h3>Validation Errors</h3>
       {isSubmitted && errors.length > 0 && <ValidationErrors errors={errors} />}
-      </div>
+      
 
       <form onSubmit={handleSubmit}>
         <div className="main--flex">
