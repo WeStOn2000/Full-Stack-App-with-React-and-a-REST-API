@@ -25,29 +25,29 @@ const UpdateCourse = () => {
 
   // Fetch course details on component mount
   // Fetch course details on component mount
-useEffect(() => {
-  const fetchCourse = async () => {
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/courses/${id}`
-      );
-      const courseData = response.data;
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/courses/${id}`
+        );
+        const courseData = response.data;
 
-      if (courseData.userId !== authUser?.id) {
-        setCourse(courseData);
-      } else {
-        navigate("/forbidden"); // Redirect if not the course owner
+        if (courseData.userId !== authUser?.id) {
+          setCourse(courseData);
+        } else {
+          navigate("/forbidden"); // Redirect if not the course owner
+        }
+      } catch (error) {
+        console.error("Error fetching course details", error);
+        navigate("/notfound"); // Redirect on error
       }
-    } catch (error) {
-      console.error("Error fetching course details", error);
-      navigate("/notfound"); // Redirect on error
-    }
-  };
+    };
 
-  if (authUser) {
-    fetchCourse();
-  }
-}, [id, authUser, navigate]);
+    if (authUser) {
+      fetchCourse();
+    }
+  }, [id, authUser, navigate]);
 
   // Update the course state with the form input changes
   const handleChange = (e) => {
@@ -61,8 +61,10 @@ useEffect(() => {
   const validateForm = () => {
     const newErrors = [];
 
-    if (!course.title.trim()) newErrors.push("Please provide a value for 'Title'");
-    if (!course.description.trim()) newErrors.push("Please provide a value for 'Description'");
+    if (!course.title.trim())
+      newErrors.push("Please provide a value for 'Title'");
+    if (!course.description.trim())
+      newErrors.push("Please provide a value for 'Description'");
     // Add any other field validations as needed
 
     return newErrors;
@@ -125,7 +127,6 @@ useEffect(() => {
       <h2>Update Course</h2>
       {/* Display validation errors only after form submission */}
       {isSubmitted && errors.length > 0 && <ValidationErrors errors={errors} />}
-      
 
       <form onSubmit={handleSubmit}>
         <div className="main--flex">
