@@ -75,7 +75,9 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 
 // POST /api/courses 
 router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
-  (['title', 'description'], req.body);
+  if (!req.body.title || !req.body.description) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
   const course = await Course.create({
     ...req.body,
     userId: req.currentUser.id

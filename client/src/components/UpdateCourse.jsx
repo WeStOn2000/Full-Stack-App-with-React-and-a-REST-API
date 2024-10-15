@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
-import ValidationErrors from "./ValidationErrors";
+
 
 const UpdateCourse = () => {
   // State to manage the course details and any validation errors
@@ -20,14 +20,16 @@ const UpdateCourse = () => {
   const { authUser } = useContext(UserContext);
   const navigate = useNavigate();
 
-  //fetch course details on component mount
+  // Fetch course details on component mount
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/courses/${id}`);
+        const response = await axios.get(
+          `http://localhost:5000/api/courses/${id}`
+        );
         const courseData = response.data;
-  
-        if (courseData.userId !== authUser?.id) { // Correct ownership check
+
+        if (courseData.userId !== authUser?.id) {
           setCourse(courseData);
         } else {
           navigate("/forbidden"); // Redirect if not the course owner
@@ -37,12 +39,12 @@ const UpdateCourse = () => {
         navigate("/notfound"); // Redirect on error
       }
     };
-  
+
     if (authUser) {
       fetchCourse();
     }
   }, [id, authUser, navigate]);
-  
+
   // Update the course state with the form input changes
   const handleChange = (e) => {
     setCourse({ ...course, [e.target.name]: e.target.value });
@@ -51,9 +53,10 @@ const UpdateCourse = () => {
   // Handle form submission to update the course details
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("AuthUser:", authUser); // Debugging
+
     try {
-      await axios.put(
+      // Send a PUT request to update the course
+      const response = await axios.put(
         `http://localhost:5000/api/courses/${id}`,
         {
           userId: authUser.id,
@@ -69,51 +72,75 @@ const UpdateCourse = () => {
           },
         }
       );
-      navigate(`/courses/${id}`); // Redirect to course detail page after successful update
+
+      // If update is successful, navigate to the updated course detail page
+      if (response.status === 204) {
+        navigate(`/courses/${id}`);
+      }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        setErrors(error.response.data.errors);
-      } else { 
+        // Handle validation errors
+        setErrors(error.response.data.errors || ["Validation error occurred."]);
+      } else {
+        // Handle unexpected errors
+        setErrors(["An unexpected error occurred."]);
         navigate("/error"); // Redirect to error page on server error
       }
     }
   };
 
+  // Handle cancel button click
+  const handleCancel = (e) => {
+    e.preventDefault();
+    navigate(`/courses/${id}`); // Navigate back to the course detail page
+  };
+
   return (
     <div className="wrap">
       <h2>Update Course</h2>
-      {errors.length > 0 && <ValidationErrors errors={errors} />}
+      {/* Display validation errors if any */}
+      {errors.length > 0 && (
+        <div className="validation--errors">
+          <h3>Validation Errors</h3>
+          <ul>
+            {errors.map((error, index) => (
+              <li key={index}>{error}</li> // Display each error message
+            ))}
+          </ul>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="main--flex">
           <div>
-            {/* Aligned with form input and textarea styling */}
-            <label>Course Title</label>
+            <label htmlFor="courseTitle">Course Title</label>
             <input
-              type="text"
+              id="courseTitle"
               name="title"
+              type="text"
               value={course.title}
               onChange={handleChange}
-              required
             />
-            <label>Description</label>
+            <label htmlFor="courseDescription">Course Description</label>
             <textarea
+              id="courseDescription"
               name="description"
               value={course.description}
               onChange={handleChange}
-              required
             />
           </div>
           <div>
-            <label>Estimated Time</label>
+            <label htmlFor="estimatedTime">Estimated Time</label>
             <input
-              type="text"
+              id="estimatedTime"
               name="estimatedTime"
+              type="text"
               value={course.estimatedTime}
               onChange={handleChange}
             />
-            <label>Materials Needed</label>
+            <label htmlFor="materialsNeeded">Materials Needed</label>
             <textarea
+              id="materialsNeeded"
               name="materialsNeeded"
               value={course.materialsNeeded}
               onChange={handleChange}
@@ -123,15 +150,13 @@ const UpdateCourse = () => {
         <button className="button" type="submit">
           Update Course
         </button>
-        <button
-          className="button button-secondary"
-          onClick={() => navigate(`/courses/${id}`)}
-        >
+        <button className="button button-secondary" onClick={handleCancel}>
           Cancel
         </button>
       </form>
     </div>
   );
 };
-//exports the component
+
+// Exports the UpdateCourse component
 export default UpdateCourse;

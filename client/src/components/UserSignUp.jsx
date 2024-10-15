@@ -1,29 +1,19 @@
-/**
- * UserSignUp component that handles creating new users and managing form submissions.
- */
-
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
-import ValidationErrors from "./ValidationErrors";
+import ValidationErrors from "./ValidationErrors"; // Component to display errors
 
 const SignUp = () => {
   const navigate = useNavigate();
   const { actions } = useContext(UserContext);
 
   // State to store validation errors and user input
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState([]); // To handle server-side validation errors
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
-
-  /**
-   * Checks if an email already exists in the system
-   * @param {string} email - The email to check
-   * @returns {Promise<boolean>} Whether the email exists
-   */
 
   /**
    * Handles form submission for user sign-up
@@ -41,19 +31,16 @@ const SignUp = () => {
 
     try {
       // Send a POST request to create a new user
-      const response = await axios.post(
-        "http://localhost:5000/api/users",
-        user
-      );
+      const response = await axios.post("http://localhost:5000/api/users", user);
 
       if (response.status === 201) {
         console.log(`${user.emailAddress} has successfully signed up.`);
-        setErrors([]);
+        setErrors([]); // Clear errors upon successful sign-up
 
         // Attempt to sign in the newly created user
         const authUser = await actions.signInUser(emailAddress, password);
         if (authUser) {
-          navigate("/");
+          navigate("/"); // Redirect to the homepage on successful login
         } else {
           setErrors([
             "Sign-in failed after registration. Please try signing in manually.",
@@ -62,30 +49,19 @@ const SignUp = () => {
       }
     } catch (error) {
       if (error.response) {
-        console.error("Server Error: ", error.response.data);
-        if (
-          error.response.status === 400 &&
-          error.response.data.message ===
-            "The email address you entered already exists"
-        ) {
-          setErrors([
-            "The email address you entered is already registered. Please use a different email or try signing in.",
-          ]);
-        } else {
-          // Handle other types of server errors
+        // If server returns validation errors (400)
+        if (error.response.status === 400) {
           const serverErrors = error.response.data.errors || [
-            error.response.data.message || "An unexpected error occurred.",
+            "Validation error occurred.",
           ];
-          setErrors(
-            Array.isArray(serverErrors) ? serverErrors : [serverErrors]
-          );
+          setErrors(serverErrors); // Display validation errors from the server
+        } else {
+          setErrors(["An unexpected error occurred."]); // Handle other errors
         }
       } else if (error.request) {
-        console.error("No response received: ", error.request);
         setErrors(["No response from the server. Please try again later."]);
       } else {
-        console.error("Error setting up request: ", error.message);
-        setErrors([error.message]);
+        setErrors([error.message]); // Handle unexpected errors
       }
     }
   };
@@ -95,7 +71,7 @@ const SignUp = () => {
    */
   const handleCancel = (e) => {
     e.preventDefault();
-    navigate("/");
+    navigate("/"); // Navigate back to the homepage
   };
 
   return (
