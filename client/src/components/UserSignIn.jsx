@@ -20,22 +20,17 @@ const SignIn = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
 
-    const credentials = {
-      username: email,
-      password: password,
-    };
-
     try {
-      // Call the signInUser method with the user's credentials
-      const user = await actions.signInUser(credentials);
+      // Call the signInUser method with the user's email and password directly
+      const user = await actions.signInUser(email, password);
       if (user) {
-        console.log('Signed in user:', user);
+        console.log("Signed in user:", user);
         navigate("/");
       } else {
         setErrors(["Sign in was unsuccessful. Please check your credentials."]);
       }
     } catch (error) {
-      console.error("Sign in error:", error); 
+      console.error("Sign in error:", error);
       if (error.response && error.response.status === 401) {
         setErrors(["Unauthorized: Incorrect email or password."]);
       } else {
@@ -75,7 +70,6 @@ const SignIn = () => {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
           />
           <label htmlFor="password">Password</label>
           <input
@@ -84,7 +78,6 @@ const SignIn = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
           />
           <button className="button" type="submit">
             Sign In
