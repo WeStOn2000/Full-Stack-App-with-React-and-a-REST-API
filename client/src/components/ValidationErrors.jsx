@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 const ValidationErrors = ({ errors }) => {
   return (
     <div className="validation--errors">
-      <h2 className="validation--errors--label">Validation Errors</h2>
       <ul>
         {errors.map((error, i) => (
           <li key={i}>{error}</li> // Display each error in a list

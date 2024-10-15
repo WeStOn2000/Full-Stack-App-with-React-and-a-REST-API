@@ -18,21 +18,42 @@ const CreateCourse = () => {
     materialsNeeded: "", // Materials needed for the course
   });
 
-  // State to hold validation or error messages from the server
-  const [errors, setErrors] = useState([]);
+  // State to hold validation errors
+  const [errors, setErrors] = useState({
+    title: false, // Flag for title field error
+    description: false, // Flag for description field error
+    other: [], // Array to hold other error messages
+  });
 
   // Function to handle changes in the form fields
   const handleChange = (e) => {
     // Update the course state with the new value for the changed field
     setCourse({
       ...course,
-      [e.target.name]: e.target.value, // Update the respective field in course state
+      [e.target.name]: e.target.value,
     });
+    // Clear the error for this field when the user starts typing
+    if (e.target.name === 'title' || e.target.name === 'description') {
+      setErrors(prev => ({ ...prev, [e.target.name]: false }));
+    }
   };
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
+
+    // Validate title and description
+    const newErrors = {
+      title: !course.title.trim(), // Check if title is empty
+      description: !course.description.trim(), // Check if description is empty
+      other: [],
+    };
+
+    // If there are validation errors, update the errors state and stop submission
+    if (newErrors.title || newErrors.description) {
+      setErrors(newErrors);
+      return;
+    }
 
     try {
       // Send a POST request to create a new course
@@ -55,17 +76,16 @@ const CreateCourse = () => {
     } catch (error) {
       // Handle errors from the API
       if (error.response) {
-        // Check if the error has a response from the server
         if (error.response.status === 400) {
           // If a 400 (bad request) error, extract validation errors
-          setErrors(error.response.data.errors || ["Validation error occurred."]); // Set validation errors
+          setErrors(prev => ({ ...prev, other: error.response.data.errors || ["Validation error occurred."] }));
         } else {
           // Handle other unexpected errors
-          setErrors(["An unexpected error occurred."]); // Handle unexpected errors
+          setErrors(prev => ({ ...prev, other: ["An unexpected error occurred."] }));
         }
       } else {
         // Handle network issues
-        setErrors(["No response from the server."]); // Handle network issues
+        setErrors(prev => ({ ...prev, other: ["No response from the server."] }));
       }
     }
   };
@@ -81,64 +101,74 @@ const CreateCourse = () => {
       <div className="wrap">
         <h2>Create Course</h2>
         {/* Display validation errors if any */}
-        {errors.length > 0 && (
+        {(errors.title || errors.description || errors.other.length > 0) && (
           <div className="validation--errors">
             <h3>Validation Errors</h3>
             <ul>
-              {errors.map((error, index) => (
-                <li key={index}>{error}</li> // Display each error message
+              {errors.title && <li>Please provide a value for Title</li>}
+              {errors.description && <li>Please provide a value for Description</li>}
+              {errors.other.map((error, index) => (
+                <li key={index}>{error}</li>
               ))}
             </ul>
           </div>
         )}
 
+        {/* Course creation form */}
         <form onSubmit={handleSubmit}>
           <div className="main--flex">
             <div>
+              {/* Course Title input */}
               <label htmlFor="courseTitle">Course Title</label>
               <input
                 id="courseTitle"
-                name="title" // Use "title" to match the state
+                name="title"
                 type="text"
                 value={course.title}
-                onChange={handleChange} // Handle changes in the title input
+                onChange={handleChange}
               />
+              {/* Display course creator's name */}
               <p>
-                By {authUser.firstName} {authUser.lastName} {/* Display user's name */}
+                By {authUser.firstName} {authUser.lastName}
               </p>
 
+              {/* Course Description textarea */}
               <label htmlFor="courseDescription">Course Description</label>
               <textarea
                 id="courseDescription"
-                name="description" // Use "description" to match the state
+                name="description"
                 value={course.description}
-                onChange={handleChange} // Handle changes in the description textarea
+                onChange={handleChange}
               ></textarea>
             </div>
             <div>
+              {/* Estimated Time input */}
               <label htmlFor="estimatedTime">Estimated Time</label>
               <input
                 id="estimatedTime"
-                name="estimatedTime" // Use "estimatedTime" to match the state
+                name="estimatedTime"
                 type="text"
                 value={course.estimatedTime}
-                onChange={handleChange} // Handle changes in the estimated time input
+                onChange={handleChange}
               />
 
+              {/* Materials Needed textarea */}
               <label htmlFor="materialsNeeded">Materials Needed</label>
               <textarea
                 id="materialsNeeded"
-                name="materialsNeeded" // Use "materialsNeeded" to match the state
+                name="materialsNeeded"
                 value={course.materialsNeeded}
-                onChange={handleChange} // Handle changes in the materials needed textarea
+                onChange={handleChange}
               ></textarea>
             </div>
           </div>
+          {/* Submit button */}
           <button className="button" type="submit">
-            Create Course {/* Button to submit the form */}
+            Create Course
           </button>
+          {/* Cancel button */}
           <button className="button button-secondary" onClick={handleCancel}>
-            Cancel {/* Button to cancel course creation and navigate home */}
+            Cancel
           </button>
         </form>
       </div>
