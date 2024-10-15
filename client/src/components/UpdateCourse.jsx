@@ -3,16 +3,19 @@ import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { UserContext } from "../context/UserContext";
-
+import ValidationErrors from "./ValidationErrors"; // Assuming you have this component
 
 const UpdateCourse = () => {
-  // State to manage the course details and any validation errors
+  // State to manage the course details
   const [course, setCourse] = useState({
     title: "",
     description: "",
     estimatedTime: "",
     materialsNeeded: "",
   });
+
+  // State to track form submission and validation errors
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [errors, setErrors] = useState([]);
 
   // Get the course id from the URL parameters and authenticated user info from context
@@ -21,38 +24,60 @@ const UpdateCourse = () => {
   const navigate = useNavigate();
 
   // Fetch course details on component mount
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/courses/${id}`
-        );
-        const courseData = response.data;
+  // Fetch course details on component mount
+useEffect(() => {
+  const fetchCourse = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/courses/${id}`
+      );
+      const courseData = response.data;
 
-        if (courseData.userId !== authUser?.id) {
-          setCourse(courseData);
-        } else {
-          navigate("/forbidden"); // Redirect if not the course owner
-        }
-      } catch (error) {
-        console.error("Error fetching course details", error);
-        navigate("/notfound"); // Redirect on error
+      if (courseData.userId !== authUser?.id) {
+        setCourse(courseData);
+      } else {
+        navigate("/forbidden"); // Redirect if not the course owner
       }
-    };
-
-    if (authUser) {
-      fetchCourse();
+    } catch (error) {
+      console.error("Error fetching course details", error);
+      navigate("/notfound"); // Redirect on error
     }
-  }, [id, authUser, navigate]);
+  };
+
+  if (authUser) {
+    fetchCourse();
+  }
+}, [id, authUser, navigate]);
 
   // Update the course state with the form input changes
   const handleChange = (e) => {
     setCourse({ ...course, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Validates the form fields before submission.
+   * @returns {string[]} Array of error messages if validation fails.
+   */
+  const validateForm = () => {
+    const newErrors = [];
+
+    if (!course.title.trim()) newErrors.push("Please provide a value for 'Title'");
+    if (!course.description.trim()) newErrors.push("Please provide a value for 'Description'");
+    // Add any other field validations as needed
+
+    return newErrors;
+  };
+
   // Handle form submission to update the course details
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitted(true);
+
+    const validationErrors = validateForm();
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
 
     try {
       // Send a PUT request to update the course
@@ -79,7 +104,7 @@ const UpdateCourse = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        // Handle validation errors
+        // Handle validation errors from the server
         setErrors(error.response.data.errors || ["Validation error occurred."]);
       } else {
         // Handle unexpected errors
@@ -98,17 +123,11 @@ const UpdateCourse = () => {
   return (
     <div className="wrap">
       <h2>Update Course</h2>
-      {/* Display validation errors if any */}
-      {errors.length > 0 && (
-        <div className="validation--errors">
-          <h3>Validation Errors</h3>
-          <ul>
-            {errors.map((error, index) => (
-              <li key={index}>{error}</li> // Display each error message
-            ))}
-          </ul>
-        </div>
-      )}
+      {/* Display validation errors only after form submission */}
+      <div className="validation--errors">
+            <h3>Validation Errors</h3>
+      {isSubmitted && errors.length > 0 && <ValidationErrors errors={errors} />}
+      </div>
 
       <form onSubmit={handleSubmit}>
         <div className="main--flex">
